@@ -1,0 +1,128 @@
+Win(null)
+
+Int type[2500]
+Int xx[2500]
+Int yy[2500]
+Int olist[2500]
+Int clist[2500]
+Int g[2500]
+Int h[2500]
+Int f[2500]
+
+x=0;y=0;z=0
+tileadded=0
+startx=0
+starty=0
+finishx=49
+finishy=49
+finished=0
+
+Do n=0,2499
+  olist[n]=0
+  clist[n]=0
+  g[n]=0; h[n]=0; f[n]=0
+  type[n]=0
+  xx[n]=n%50
+  yy[n]=n/50
+Loop
+
+Do
+  done:
+  readmouse(x,y,z)
+  select screen(1)  
+  key=readkey()
+  cls
+  tileadded=0
+  If (z=3)
+    Do n=0,2499
+      type[n]=0
+    Loop
+  Endif
+  Do n=0,2499
+    If (z=4 And tileadded=0)
+      If (x<xx[n]*10+10 And x>=xx[n] And y<yy[n]*10+10 And y>=yy[n]*10) type[n]=1; tileadded=1
+    Endif
+    If (z=1 And tileadded=0 And x<500 And y<500) startx=x/10; starty=y/10; tileadded=1
+    If (z=2 And tileadded=0 And x<500 And y<500) finishx=x/10; finishy=y/10; tileadded=1
+    If (type[n]=0) solidcolor(Darkblue)
+    If (type[n]=1) solidcolor(Blue)
+    If (type[n]=3) solidcolor(White)
+    If (xx[n]=startx And yy[n]=starty) solidcolor(Darkgreen)
+    If (xx[n]=finishx And yy[n]=finishy) solidcolor(Darkred)
+    solidrectangle(xx[n]*10,yy[n]*10,xx[n]*10+10,yy[n]*10+10)
+  Loop
+  
+  
+  mx=startx; my=starty
+  mz=mx+my*50
+  h[mz]=iabs(yy[mz]-finishy)+iabs(xx[mz]-finishx)
+  mo=0
+  toc=0
+  Do n=0,2499
+    h[n]=iabs(yy[n]-finishy)+iabs(xx[n]-finishx)    
+  Loop
+  If (key=32)
+    Do
+      If (type[mz+1]=0 And clist[mz+1]=0 And xx[mz]+1<50) olist[mz+1]=1; g[mz+1]=g[mz]+1
+      If (type[mz+50]=0 And clist[mz+50]=0 And yy[mz]+1<50) olist[mz+50]=1; g[mz+50]=g[mz]+1
+      If (type[mz-1]=0 And clist[mz-1]=0 And xx[mz]-1>=0) olist[mz-1]=1; g[mz-1]=g[mz]+1
+      If (type[mz-50]=0 And clist[mz-50]=0 And yy[mz]-1>=0) olist[mz-50]=1; g[mz-50]=g[mz]+1
+
+      clist[mz]=1;olist[mz]=0
+
+      pickf=2500
+      Do n=0,2499
+        f[n]=h[n]+g[n]
+        If (finishx+finishy*100<startx+starty*100)
+          If (f[n]<pickf And olist[n]=1 And clist[n]=0) pickf=f[n]; mz=n
+        Endif
+        If (finishx+finishy*100>=startx+starty*100)
+          If (f[n]<=pickf And olist[n]=1 And clist[n]=0) pickf=f[n]; mz=n
+        Endif
+      Loop
+
+      select screen(1)  
+      Do n=0,2499
+        If (type[n]=0) solidcolor(Darkblue)
+        If (type[n]=1) solidcolor(Blue)
+        If (olist[n]=1) solidcolor(White)
+        If (clist[n]=1) solidcolor(Yellow)
+        If (xx[n]=startx And yy[n]=starty) solidcolor(Darkgreen)
+        If (xx[n]=finishx And yy[n]=finishy) solidcolor(Darkred)
+        solidrectangle(xx[n]*10,yy[n]*10,xx[n]*10+10,yy[n]*10+10)
+        //Outtextxy(xx[n]*10,yy[n]*10,itot(g[n]))
+      Loop
+
+      selectscreen(0)
+      bitbltscreen(1)
+      Delay(1)
+      readquitkey(27)
+
+      If (mz=finishx+finishy*50)
+        Do
+          Do m=0,2499
+            If (g[m]=g[mz]-1 And clist[m]=1)
+              If (xx[m]-1=xx[mz] And yy[m]=yy[mz]) mz=m; type[m]=3
+              If (xx[m]+1=xx[mz] And yy[m]=yy[mz]) mz=m; type[m]=3
+              If (yy[m]-1=yy[mz] And xx[m]=xx[mz]) mz=m; type[m]=3
+              If (yy[m]+1=yy[mz] And xx[m]=xx[mz]) mz=m; type[m]=3
+            Endif
+          Loop
+          If (mz=startx+starty*50) finished=1; Goto done
+        Loop
+      Endif
+      //If (mz=finishx+finishy*50) waitkey(32); quit
+
+    Loop
+  Endif
+
+  If (key=27) Goto quit
+  selectscreen(0)
+  bitbltscreen(1)
+  If (finished=1) waitkey(27); quit
+Loop
+
+quit:
+selectscreen(0)
+bitbltscreen(1)
+quit

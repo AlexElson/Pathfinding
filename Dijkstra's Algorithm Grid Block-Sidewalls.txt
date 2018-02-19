@@ -1,0 +1,153 @@
+Win(null)[]
+
+Int type[2500]
+Int xx[2500]
+Int yy[2500]
+Int olist[2500]
+Int clist[2500]
+Int dist[2500]
+
+x=0;y=0;z=0
+startx=0; starty=0
+finishx=49; finishy=49
+finished=0
+
+Do n=0,2499
+  olist[n]=0
+  clist[n]=0
+  dist[n]=0
+  type[n]=0
+  xx[n]=n%50
+  yy[n]=n/50
+Loop
+
+Do
+  readmouse(x,y,z)
+  select screen(1)
+  key=readkey()
+  cls
+
+  /////////////////////////////Display Tiles
+  Do n=0,2499 
+    If (type[n]=0) solidcolor(Darkblue)
+    If (type[n]=1) solidcolor(Blue)
+    solidrectangle(xx[n]*8,yy[n]*8,xx[n]*8+8,yy[n]*8+8)
+    If (z=4 And x>=xx[n]*8 And x<xx[n]*8+8 And y>=yy[n]*8 And y<yy[n]*8+8)
+      type[n]=1      
+    Endif
+    If (z=1 And x>=xx[n]*8 And x<xx[n]*8+8 And y>=yy[n]*8 And y<yy[n]*8+8)
+      startx=xx[n]; starty=yy[n] 
+    Endif
+    If (z=2 And x>=xx[n]*8 And x<xx[n]*8+8 And y>=yy[n]*8 And y<yy[n]*8+8)
+      finishx=xx[n]; finishy=yy[n]
+    Endif
+  Loop
+  solidcolor(Darkgreen)
+  solidrectangle(startx*8,starty*8,startx*8+8,starty*8+8)
+  solidcolor(Darkred)
+  solidrectangle(finishx*8,finishy*8,finishx*8+8,finishy*8+8)
+
+
+
+  //////////////////////////////Find path
+  If (key=32)
+    Break
+  Endif
+
+  If (key=27) Goto quit
+  selectscreen(0)
+  bitbltscreen(1)
+  Delay(25)
+Loop
+
+
+
+
+
+////////////////////////////////////////////////Find path
+mx=startx; my=starty
+mz=mx+my*50
+olist[mz]=1
+dist[mz]=1
+
+Do
+  select screen(1)  
+  cls
+
+
+  dis=1000
+  Do n=0,2499
+    If (dist[n]<dis And olist[n]=1 And clist[n]=0) dis=dist[n]
+  Loop
+  Do n=0,2499 
+    If (olist[n]=1 And dis=dist[n])
+      toc=0
+      If (xx[n]<49 And type[n+1 ]=0 And olist[n+1 ]=0 And clist[n+1 ]=0) olist[n+1 ]=1; olist[n]=0; clist[n]=1; dist[n+1 ]=dist[n]+1; toc=1
+      If (yy[n]<49 And type[n+50]=0 And olist[n+50]=0 And clist[n+50]=0) olist[n+50]=1; olist[n]=0; clist[n]=1; dist[n+50]=dist[n]+1; toc=1
+      If (xx[n]>0  And type[n-1 ]=0 And olist[n-1 ]=0 And clist[n-1 ]=0) olist[n-1 ]=1; olist[n]=0; clist[n]=1; dist[n-1 ]=dist[n]+1; toc=1
+      If (yy[n]>0  And type[n-50]=0 And olist[n-50]=0 And clist[n-50]=0) olist[n-50]=1; olist[n]=0; clist[n]=1; dist[n-50]=dist[n]+1; toc=1
+
+      If (xx[n]<49 And yy[n]<49 And type[n+1]=0 And type[n+50]=0 And type[n+51]=0 And olist[n+51]=0 And clist[n+51]=0) olist[n+51]=1; olist[n]=0; clist[n]=1; dist[n+51]=dist[n]+1; toc=1
+      If (yy[n]<49 And xx[n]>0  And type[n-1]=0 And type[n+50]=0 And type[n+49]=0 And olist[n+49]=0 And clist[n+49]=0) olist[n+49]=1; olist[n]=0; clist[n]=1; dist[n+49]=dist[n]+1; toc=1
+      If (xx[n]>0 And xx[n]>0   And type[n-1]=0 And type[n-50]=0 And type[n-51]=0 And olist[n-51]=0 And clist[n-51]=0) olist[n-51]=1; olist[n]=0; clist[n]=1; dist[n-51]=dist[n]+1; toc=1
+      If (yy[n]>0 And xx[n]<49  And type[n+1]=0 And type[n-50]=0 And type[n-49]=0 And olist[n-49]=0 And clist[n-49]=0) olist[n-49]=1; olist[n]=0; clist[n]=1; dist[n-49]=dist[n]+1; toc=1
+      If (toc=0) olist[n]=0; clist[n]=1
+    Endif
+  Loop
+
+  If (olist[finishx+finishy*50]=1)
+    mx=finishx; my=finishy; mz=mx+my*50
+    Do
+      toc=0
+      If (toc=0 And dist[mz+1 ]=dist[mz]-1) toc=1; mz=mz+1; type[mz]=3
+      If (toc=0 And dist[mz-1 ]=dist[mz]-1) toc=1; mz=mz-1; type[mz]=3
+      If (toc=0 And dist[mz+50]=dist[mz]-1) toc=1; mz=mz+50; type[mz]=3
+      If (toc=0 And dist[mz-50]=dist[mz]-1) toc=1; mz=mz-50; type[mz]=3
+
+      If (toc=0 And dist[mz+51]=dist[mz]-1) toc=1; mz=mz+51; type[mz]=3
+      If (toc=0 And dist[mz-51]=dist[mz]-1) toc=1; mz=mz-51; type[mz]=3
+      If (toc=0 And dist[mz+49]=dist[mz]-1) toc=1; mz=mz+49; type[mz]=3
+      If (toc=0 And dist[mz-49]=dist[mz]-1) toc=1; mz=mz-49; type[mz]=3
+      If (dist[mz]=1) Goto quit
+    Loop
+  Endif
+  
+  
+  /////////////////////////////Display Tiles
+  Do n=0,2499 
+    If (type[n]=0) solidcolor(Darkblue)
+    If (type[n]=1) solidcolor(Blue)
+    If (olist[n]=1) solidcolor(White)
+    If (clist[n]=1) solidcolor(Yellow)
+    solidrectangle(xx[n]*8,yy[n]*8,xx[n]*8+8,yy[n]*8+8)
+    solidcolor(Darkgreen)
+    solidrectangle(startx*8,starty*8,startx*8+8,starty*8+8)
+    solidcolor(Darkred)
+    solidrectangle(finishx*8,finishy*8,finishx*8+8,finishy*8+8)
+  Loop
+
+  If (key=27) Goto quit
+  selectscreen(0)
+  bitbltscreen(1)
+  Delay(15)
+Loop`
+
+
+
+
+quit:
+Do n=0,2499 
+  If (type[n]=0) solidcolor(Darkblue)
+  If (type[n]=1) solidcolor(Blue)
+  If (type[n]=3) solidcolor(White)
+  solidrectangle(xx[n]*8,yy[n]*8,xx[n]*8+8,yy[n]*8+8)
+  solidcolor(Darkgreen)
+  solidrectangle(startx*8,starty*8,startx*8+8,starty*8+8)
+  solidcolor(Darkred)
+  solidrectangle(finishx*8,finishy*8,finishx*8+8,finishy*8+8) 
+Loop
+
+selectscreen(0)
+bitbltscreen(1)
+waitkey()
+quit
