@@ -1,3 +1,9 @@
+##### Mouse with scroll wheel required. 
+Left click - Start position  
+Right click - End position  
+Middle scroll wheel click - Draw Wall  
+Space - Begin search  
+
 # Dijkstra's Algorithm
 
 Both Dijkstra's and A* algorithms work by finding the shorted path between two points. 
